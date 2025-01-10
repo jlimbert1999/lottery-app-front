@@ -23,6 +23,7 @@ export class HomeComponent {
     {
       label: 'Premios',
       icon: 'pi pi-gift',
+      routerLink: 'prizes',
     },
   ];
 }

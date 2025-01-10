@@ -1,65 +1,56 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+  signal,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { DataViewModule } from 'primeng/dataview';
+import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
+
+import { PrizeCardComponent, RaffleComponent } from '../../components';
+import { ParticipantService } from '../../services/participant.service';
+import { prizeResp } from '../../../infrastructure';
 @Component({
   selector: 'app-setup',
-  imports: [CommonModule, CardModule],
+  imports: [
+    CommonModule,
+    CardModule,
+    PrizeCardComponent,
+    RaffleComponent,
+    DataViewModule,
+    ButtonModule,
+  ],
   templateUrl: './setup.component.html',
   styleUrl: './setup.component.css',
   changeDetection: ChangeDetectionStrategy.Default,
 })
-export class SetupComponent {
-  isSpinning = false;
-  displayedNumber = '000000000';
-  winnerNumber = '';
+export class SetupComponent implements OnInit {
+  private participantService = inject(ParticipantService);
 
-  prizes = [
-    {
-      name: 'Motocicleta',
-      description: 'Una motocicleta',
-      imagen:
-        'https://image.made-in-china.com/2f0j00sldkSvpMlfou/Small-Size-Motorcycle-for-Adult-Children-49cc-50cc-Motorcycle-Mini-Cub-Motorbike-with-EEC.jpg',
-    },
-    {
-      name: 'Motocicleta',
-      description: 'Una motocicleta',
-      imagen:
-        'https://image.made-in-china.com/2f0j00sldkSvpMlfou/Small-Size-Motorcycle-for-Adult-Children-49cc-50cc-Motorcycle-Mini-Cub-Motorbike-with-EEC.jpg',
-    },
-  ];
+  prizes = toSignal(this.participantService.getActivePrizes(), {
+    initialValue: [],
+  });
 
-  // Simula la llamada al backend para obtener el ganador
-  getWinnerFromBackend(): Promise<string> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve('7423'); // Ganador enviado desde el backend
-      }, 3000); // Simula un retraso de 3 segundos
-    });
+  currentPrize = signal<prizeResp | null>(null);
+
+  ngOnInit(): void {}
+
+  onSelectPrize(item: prizeResp) {
+    this.currentPrize.set(item);
   }
 
-  async startRaffle() {
-    this.isSpinning = true;
-    this.winnerNumber = '';
-
-    // Generar números aleatorios durante 3 segundos
-    const interval = setInterval(() => {
-      this.displayedNumber = this.getRandomNumber();
-    }, 100);
-
-    // Obtener el ganador después de 3 segundos
-    this.winnerNumber = await this.getWinnerFromBackend();
-
-    clearInterval(interval); // Detener la animación
-    this.isSpinning = false;
-    this.displayedNumber = this.winnerNumber; // Mostrar el ganador
+  getWinner() {
+    if (!this.currentPrize()) return;
+    return this.participantService
+      .getWinner(this.currentPrize()?._id!)
+      .subscribe((data) => {
+        console.log(data);
+      });
   }
 
-  getRandomNumber(): string {
-    const length = Math.floor(Math.random() * 5) + 1; // Números de 1 a 5 dígitos
-    let number = '';
-    for (let i = 0; i < length; i++) {
-      number += Math.floor(Math.random() * 10).toString();
-    }
-    return number;
-  }
+  
 }

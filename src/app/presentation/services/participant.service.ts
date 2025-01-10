@@ -1,12 +1,14 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
+
 import { environment } from '../../../environments/environment';
+import { participant } from '../../domain/interfaces/participant.interface';
 import {
   participantEntity,
   participantIndividual,
-} from '../../infrastructure/interfaces/participant-resp.interface';
-import { participant } from '../../domain/interfaces/participant.interface';
+  prizeResp,
+} from '../../infrastructure';
 
 type participantResponse = participantEntity[] | participantIndividual[];
 interface paginationParams {
@@ -18,11 +20,21 @@ interface paginationParams {
 })
 export class ParticipantService {
   private http = inject(HttpClient);
-  private url = `${environment.baseUrl}/participants`;
-  constructor() {}
+  private readonly url = environment.baseUrl;
+
+  getWinner(prizeId: string) {
+    return this.http.get(`${this.url}/winner/${prizeId}`);
+  }
+  getActivePrizes() {
+    return this.http.get<prizeResp[]>(`${this.url}/prizes/active`);
+  }
 
   uploadParticipants(data: Object[]) {
-    return this.http.post(this.url, { data });
+    return this.http.post(`${this.url}/participants`, { data });
+  }
+
+  uploadPrizes(data: Object[]) {
+    return this.http.post(`${this.url}/prizes`, { data });
   }
 
   getParticipants({ limit, offset }: paginationParams): Observable<{
@@ -31,9 +43,12 @@ export class ParticipantService {
   }> {
     const params = new HttpParams({ fromObject: { limit, offset } });
     return this.http
-      .get<{ participants: participantResponse; length: number }>(this.url, {
-        params,
-      })
+      .get<{ participants: participantResponse; length: number }>(
+        `${this.url}/participants`,
+        {
+          params,
+        }
+      )
       .pipe(
         map(({ participants, length }) => ({
           participants: participants
@@ -68,5 +83,9 @@ export class ParticipantService {
           length,
         }))
       );
+  }
+
+  getPrizes() {
+    return this.http.get<any[]>(`${this.url}/prizes`);
   }
 }
