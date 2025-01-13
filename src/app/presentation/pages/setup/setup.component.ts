@@ -44,13 +44,11 @@ export class SetupComponent implements OnInit {
   }
 
   getWinner() {
-    if (!this.currentPrize()) return;
+
     return this.participantService
       .getWinner(this.currentPrize()?._id!)
       .subscribe((data) => {
         console.log(data);
       });
   }
-
-  
 }

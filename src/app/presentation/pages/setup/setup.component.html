@@ -67,7 +67,7 @@
         }
       </div>
       <div class="w-1/2">
-        <raffle (onStart)="getWinner()" />
+        <raffle (onStart)="getWinner()" [prize]="currentPrize()!" />
       </div>
     </div>
   </div>

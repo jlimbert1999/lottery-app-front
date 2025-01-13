@@ -32,7 +32,7 @@ import { participant } from '../../domain/interfaces/participant.interface';
         mode="advanced"
       >
         <ng-template #empty>
-          <div>Drag and drop files to here to upload.</div>
+          <div>Seleccione un archivo para cargar los datos</div>
         </ng-template>
       </p-fileupload>
     </div>

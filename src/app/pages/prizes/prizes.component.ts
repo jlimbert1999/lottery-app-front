@@ -26,7 +26,7 @@ import { prizeResp } from '../../infrastructure';
     CommonModule,
   ],
   template: `
-    @if (false) {
+    @if (isLoading()) {
     <read-excel (onLoad)="onExcelLoad($event)" />
     } @else {
     <div class="card sm:px-8">
@@ -74,7 +74,6 @@ import { prizeResp } from '../../infrastructure';
 export class PrizesComponent implements OnInit {
   private participantService = inject(ParticipantService);
   datasource = signal<prizeResp[]>([]);
-  datasize = signal<number>(0);
   limit = signal(10);
   index = signal(0);
   offset = computed(() => this.limit() * this.index());
@@ -85,7 +84,6 @@ export class PrizesComponent implements OnInit {
   }
 
   getData() {
-    this.isLoading.set(true);
     this.participantService.getPrizes().subscribe((data) => {
       this.datasource.set(data);
       this.isLoading.set(false);

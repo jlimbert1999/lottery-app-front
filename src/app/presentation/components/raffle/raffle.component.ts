@@ -2,102 +2,108 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   inject,
+  input,
   output,
+  signal,
 } from '@angular/core';
-import { interval, Subscription } from 'rxjs';
+import {
+  catchError,
+  debounce,
+  interval,
+  Subject,
+  Subscription,
+  switchMap,
+  tap,
+  throwError,
+  timer,
+} from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ParticipantService } from '../../services/participant.service';
+import { ButtonModule } from 'primeng/button';
+import { prizeResp } from '../../../infrastructure';
 
 @Component({
   selector: 'raffle',
-  imports: [CommonModule],
+  imports: [CommonModule, ButtonModule],
   template: `
     <div class="flex flex-col items-center justify-center">
       <div class="text-6xl font-bold mb-8">
         <span
           [ngClass]="{
-            'animate-bounce': isSpinning,
-            'text-green-500': !isSpinning && winnerNumber
+            'animate-bounce': isSearching(),
+            'text-green-500': !isSearching()
           }"
         >
           {{ displayedNumber }}
         </span>
       </div>
-      <button
-        (click)="startRaffle()"
-        class="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
-        [disabled]="isSpinning"
-      >
-        Iniciar Sorteo
-      </button>
+      <p-button
+        label="INICIAR"
+        [rounded]="true"
+        [disabled]="isSearching()"
+        (onClick)="startRaffle()"
+        size="large"
+      />
     </div>
-  `,
-  styles: `
-    @keyframes spin {
-      0% {
-        transform: translateY(0);
-      }
-      50% {
-        transform: translateY(-10px);
-      }
-      100% {
-        transform: translateY(0);
-      }
-    }
-
-    .animate-bounce {
-      animation: spin 0.2s infinite;
-    }
-
   `,
   changeDetection: ChangeDetectionStrategy.Default,
 })
 export class RaffleComponent {
-  isSpinning = false;
-  displayedNumber = '000000000';
-  winnerNumber = '';
-  private spinSubscription!: Subscription;
-
+  private destroyRef = inject(DestroyRef);
+  private startSubject = new Subject<void>();
   private participantService = inject(ParticipantService);
 
-  onStart = output<void>();
+  prize = input.required<prizeResp>();
+  onWinnerSelected = output<void>();
 
-  // Simula la llamada al backend para obtener el ganador
-  getWinnerFromBackend(): Promise<string> {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve('7423'); // Ganador enviado desde el backend
-      }, 3000); // Simula un retraso de 3 segundos
-    });
+  displayedNumber = '000000000';
+  private spinSubscription?: Subscription;
+
+  isSearching = signal(false);
+
+  constructor() {
+    this.startSubject
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        debounce(() => timer(2000)),
+        switchMap(() =>
+          this.participantService.getWinner(this.prize()._id).pipe(
+            catchError((error) => {
+              console.log('Error en getWinner:', error);
+              return throwError(() => error); // Propagar el error para que el bloque error en subscribe lo capture
+            })
+          )
+        )
+      )
+      .subscribe({
+        next: (winner) => {
+          console.log('se competl');
+          this.stopRaffle();
+        },
+        error: (error) => {
+          console.log(error);
+          this.stopRaffle();
+        },
+      });
   }
 
-  async startRaffle() {
-    this.onStart.emit()
-    console.log('started');
-    this.isSpinning = true;
-    this.winnerNumber = '';
-
-    // Observable que emite cada 100ms
-    const spin$ = interval(20);
-
-    // Suscríbete al Observable para cambiar los números
-    this.spinSubscription = spin$.subscribe(() => {
+  startRaffle() {
+    this.startSubject.next();
+    if (this.isSearching()) return;
+    this.isSearching.set(true);
+    this.displayedNumber = '000000000';
+    this.spinSubscription = interval(100).subscribe(() => {
       this.displayedNumber = this.getRandomNumber();
     });
-
-    // Espera la respuesta del backend
-    this.winnerNumber = await this.getWinnerFromBackend();
-
-    // Detén la animación y muestra el ganador
-    this.stopSpinning();
-    this.displayedNumber = this.winnerNumber;
   }
 
-  stopSpinning() {
+  stopRaffle() {
     if (this.spinSubscription) {
       this.spinSubscription.unsubscribe();
     }
-    this.isSpinning = false;
+    this.isSearching.set(false);
   }
 
   getRandomNumber(): string {
@@ -107,5 +113,9 @@ export class RaffleComponent {
       number += Math.floor(Math.random() * 10).toString();
     }
     return number;
+  }
+
+  private _getRandomDelay() {
+    return Math.floor(Math.random() * (12000 - 6000 + 1)) + 6000;
   }
 }

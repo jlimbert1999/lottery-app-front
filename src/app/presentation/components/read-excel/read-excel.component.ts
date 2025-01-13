@@ -16,7 +16,7 @@ import { read, utils } from 'xlsx';
         mode="advanced"
       >
         <ng-template #empty>
-          <div>Drag and drop files to here to upload.</div>
+          <div>Seleccione un archivo para cargar</div>
         </ng-template>
       </p-fileupload>
     </div>
