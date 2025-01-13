@@ -1,13 +1,14 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { participant } from '../../domain/interfaces/participant.interface';
 import {
   participantEntity,
   participantIndividual,
-  prizeResp,
+  ParticipantMapper,
+  prize,
+  PrizeMapper,
 } from '../../infrastructure';
 
 type participantResponse = participantEntity[] | participantIndividual[];
@@ -23,10 +24,9 @@ export class ParticipantService {
   private readonly url = environment.baseUrl;
 
   getWinner(prizeId: string) {
-    return this.http.get(`${this.url}/winner/${prizeId}`);
-  }
-  getActivePrizes() {
-    return this.http.get<prizeResp[]>(`${this.url}/prizes/active`);
+    return this.http
+      .get<prize>(`${this.url}/winner/${prizeId}`)
+      .pipe(map((resp) => PrizeMapper.fromResponse(resp)));
   }
 
   uploadParticipants(data: Object[]) {
@@ -37,55 +37,26 @@ export class ParticipantService {
     return this.http.post(`${this.url}/prizes`, { data });
   }
 
-  getParticipants({ limit, offset }: paginationParams): Observable<{
-    participants: participant[];
-    length: number;
-  }> {
+  getParticipants({ limit, offset }: paginationParams) {
     const params = new HttpParams({ fromObject: { limit, offset } });
     return this.http
       .get<{ participants: participantResponse; length: number }>(
         `${this.url}/participants`,
-        {
-          params,
-        }
+        { params }
       )
       .pipe(
         map(({ participants, length }) => ({
-          participants: participants
-            .map((el) => {
-              switch (el.group) {
-                case 'ParticipantIndividual':
-                  const individual = el as participantIndividual;
-                  return {
-                    id: individual._id,
-                    fullname: `${individual.firstname} ${individual.middlename} ${individual.lastname}`,
-                    codeType: individual.codeType,
-                    code: individual.code,
-                    type: 'NATURAL',
-                    documentNumber: individual.dni,
-                  };
-
-                case 'ParticipantEntity':
-                  const entity = el as participantEntity;
-                  return {
-                    id: entity._id,
-                    fullname: entity.name,
-                    code: entity.code,
-                    codeType: entity.codeType,
-                    documentNumber: entity.nit,
-                    type: 'JURIDICO',
-                  };
-                default:
-                  return null;
-              }
-            })
-            .filter((item): item is participant => item !== null),
+          participants: participants.map((el) =>
+            ParticipantMapper.fromResponse(el)
+          ),
           length,
         }))
       );
   }
 
   getPrizes() {
-    return this.http.get<any[]>(`${this.url}/prizes`);
+    return this.http
+      .get<prize[]>(`${this.url}/prizes`)
+      .pipe(map((resp) => resp.map((el) => PrizeMapper.fromResponse(el))));
   }
 }

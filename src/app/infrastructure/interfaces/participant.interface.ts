@@ -1,16 +1,16 @@
-interface participantResp {
+interface participant {
   _id: string;
   code: string;
   codeType: string;
   group: string;
 }
 
-export interface participantEntity extends participantResp {
+export interface participantEntity extends participant {
   name: string;
   nit: string;
 }
 
-export interface participantIndividual extends participantResp {
+export interface participantIndividual extends participant {
   firstname: string;
   middlename: string;
   lastname: string;

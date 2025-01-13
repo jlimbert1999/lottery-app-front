@@ -1,2 +1,5 @@
-export * from './interfaces/participant-resp.interface';
-export * from './interfaces/prize-resp.interface';
+export * from './interfaces/participant.interface';
+export * from './interfaces/prize.interface';
+
+export * from './mappers/participant.mapper';
+export * from './mappers/prize.mapper';

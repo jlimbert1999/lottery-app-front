@@ -13,16 +13,17 @@ import { CardModule } from 'primeng/card';
 
 import { PrizeCardComponent, RaffleComponent } from '../../components';
 import { ParticipantService } from '../../services/participant.service';
-import { prizeResp } from '../../../infrastructure';
+import { Prize } from '../../../domain';
+import { TagModule } from 'primeng/tag';
 @Component({
   selector: 'app-setup',
   imports: [
     CommonModule,
     CardModule,
-    PrizeCardComponent,
     RaffleComponent,
     DataViewModule,
     ButtonModule,
+    TagModule,
   ],
   templateUrl: './setup.component.html',
   styleUrl: './setup.component.css',
@@ -31,24 +32,29 @@ import { prizeResp } from '../../../infrastructure';
 export class SetupComponent implements OnInit {
   private participantService = inject(ParticipantService);
 
-  prizes = toSignal(this.participantService.getActivePrizes(), {
-    initialValue: [],
-  });
+  prizes = signal<Prize[]>([]);
+  currentPrize = signal<Prize | null>(null);
 
-  currentPrize = signal<prizeResp | null>(null);
+  ngOnInit(): void {
+    this.getPrizes();
+  }
 
-  ngOnInit(): void {}
-
-  onSelectPrize(item: prizeResp) {
+  onSelectPrize(item: Prize) {
     this.currentPrize.set(item);
   }
 
-  getWinner() {
+  setWinnerPrize(prize: Prize | null) {
+    console.log(prize);
+    // this.prizes.update((values) => {
+    //   const index = values.findIndex(({ id }) => id === prize.id);
+    //   values[index] = prize;
+    //   return [...values];
+    // });
+  }
 
-    return this.participantService
-      .getWinner(this.currentPrize()?._id!)
-      .subscribe((data) => {
-        console.log(data);
-      });
+  getPrizes() {
+    this.participantService.getPrizes().subscribe((resp) => {
+      this.prizes.set(resp);
+    });
   }
 }

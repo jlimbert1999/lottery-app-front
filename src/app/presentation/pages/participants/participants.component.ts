@@ -14,8 +14,8 @@ import {
 import { ButtonModule } from 'primeng/button';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { read, utils } from 'xlsx';
-import { ParticipantService } from '../../presentation/services/participant.service';
-import { participant } from '../../domain/interfaces/participant.interface';
+import { ParticipantService } from '../../services/participant.service';
+import { Participant } from '../../../domain';
 
 @Component({
   selector: 'app-participants',
@@ -78,7 +78,7 @@ import { participant } from '../../domain/interfaces/participant.interface';
 })
 export class ParticipantsComponent {
   private participantService = inject(ParticipantService);
-  datasource = signal<participant[]>([]);
+  datasource = signal<Participant[]>([]);
   datasize = signal<number>(0);
   limit = signal(10);
   index = signal(0);
