@@ -19,11 +19,17 @@ export class HomeComponent {
       label: 'Participantes',
       icon: 'pi pi-users',
       routerLink: 'participants',
+      
     },
     {
       label: 'Premios',
       icon: 'pi pi-gift',
       routerLink: 'prizes',
+    },
+    {
+      label: 'Ganadores',
+      icon: 'pi pi-trophy',
+      routerLink: 'winners',
     },
   ];
 }

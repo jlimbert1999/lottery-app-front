@@ -2,28 +2,36 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   inject,
   OnInit,
   signal,
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { DataViewModule } from 'primeng/dataview';
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
+import { TagModule } from 'primeng/tag';
 
-import { PrizeCardComponent, RaffleComponent } from '../../components';
+import { RaffleComponent } from '../../components';
 import { ParticipantService } from '../../services/participant.service';
 import { Prize } from '../../../domain';
-import { TagModule } from 'primeng/tag';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { InputTextModule } from 'primeng/inputtext';
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-setup',
   imports: [
     CommonModule,
-    CardModule,
+    FormsModule,
     RaffleComponent,
     DataViewModule,
     ButtonModule,
     TagModule,
+    IconFieldModule,
+    InputIconModule,
+    FloatLabelModule,
+    InputTextModule,
   ],
   templateUrl: './setup.component.html',
   styleUrl: './setup.component.css',
@@ -33,7 +41,18 @@ export class SetupComponent implements OnInit {
   private participantService = inject(ParticipantService);
 
   prizes = signal<Prize[]>([]);
+  filteredPrizes = computed(() => this._filterPrizes());
+
   currentPrize = signal<Prize | null>(null);
+  term = signal<string>('');
+
+  message = computed(() => {
+    const drawn = this.prizes().filter(({ participant }) => participant).length;
+    if (drawn === 0) {
+      return `${this.prizes().length} PRESMISO DISPONILBES`;
+    }
+    return `${drawn} Sorteados / ${this.prizes().length - drawn} Disponibles`;
+  });
 
   ngOnInit(): void {
     this.getPrizes();
@@ -43,18 +62,25 @@ export class SetupComponent implements OnInit {
     this.currentPrize.set(item);
   }
 
-  setWinnerPrize(prize: Prize | null) {
-    console.log(prize);
-    // this.prizes.update((values) => {
-    //   const index = values.findIndex(({ id }) => id === prize.id);
-    //   values[index] = prize;
-    //   return [...values];
-    // });
+  setWinnerPrize(prize: Prize) {
+    this.prizes.update((values) => {
+      const index = values.findIndex(({ id }) => id === prize.id);
+      values[index] = prize;
+      return [...values];
+    });
   }
 
   getPrizes() {
     this.participantService.getPrizes().subscribe((resp) => {
       this.prizes.set(resp);
     });
+  }
+
+  private _filterPrizes(): Prize[] {
+    if (!this.term()) return this.prizes();
+    return this.prizes().filter(
+      ({ name }) =>
+        name.toLocaleLowerCase().indexOf(this.term().toLocaleLowerCase()) > -1
+    );
   }
 }

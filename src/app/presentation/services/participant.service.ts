@@ -59,4 +59,10 @@ export class ParticipantService {
       .get<prize[]>(`${this.url}/prizes`)
       .pipe(map((resp) => resp.map((el) => PrizeMapper.fromResponse(el))));
   }
+
+  getWinners() {
+    return this.http
+      .get<prize[]>(`${this.url}/winners`)
+      .pipe(map((resp) => resp.map((el) => PrizeMapper.fromResponse(el))));
+  }
 }

@@ -28,7 +28,7 @@ import { Participant } from '../../../domain';
         [customUpload]="true"
         (uploadHandler)="onUpload($event)"
         accept=".xlsx,.odt"
-        maxFileSize="1000000"
+        maxFileSize="5000000"
         mode="advanced"
       >
         <ng-template #empty>
