@@ -4,10 +4,15 @@ import { HomeComponent } from './presentation/pages/home/home.component';
 import { PrizesComponent } from './presentation/pages/prizes/prizes.component';
 import { ParticipantsComponent } from './presentation/pages/participants/participants.component';
 import { WinnersComponent } from './presentation/pages/winners/winners.component';
+import { LandingComponent } from './presentation/pages/landing/landing.component';
 
 export const routes: Routes = [
   {
-    path: 'setup',
+    path: '',
+    component: LandingComponent,
+  },
+  {
+    path: 'main',
     component: SetupComponent,
   },
   {
@@ -20,5 +25,5 @@ export const routes: Routes = [
       { path: 'winners', component: WinnersComponent },
     ],
   },
-  { path: '**', pathMatch: 'full', redirectTo: '/home' },
+  { path: '**', pathMatch: 'full', redirectTo: '' },
 ];

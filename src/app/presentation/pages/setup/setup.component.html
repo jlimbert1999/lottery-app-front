@@ -1,89 +1,51 @@
-<div class="flex flex-col min-h-screen">
+<div class="flex flex-col h-screen animate__animated animate__fadeIn">
+  <!-- Título -->
   <div class="bg-gradient-to-r from-green-200 to-blue-500 text-white py-2">
     <p
-      class="text-center text-4xl font-bold animate__animated animate__flash animate__infinite"
+      class="text-center text-md sm:text-4xl font-bold animate__animated animate__flash animate__infinite"
     >
       {{ message() }}
     </p>
   </div>
-  <div class="flex flex-1">
+
+  <!-- Contenido Principal -->
+  <div class="flex-1 flex flex-col sm:flex-row">
+    <!-- Columna de Premios -->
     <div class="w-1/3 flex flex-col">
-      <div class="px-4 py-2 space-y-2">
-        <div class="text-2xl font-semibold">LISTADO DE PREMIOS</div>
-        <div class="flex justify-end">
-          <p-iconfield>
-            <p-inputicon styleClass="pi pi-search" />
-            <input
-              type="text"
-              pInputText
-              placeholder="Buscar premio"
-              [(ngModel)]="term"
-            />
-          </p-iconfield>
-        </div>
+      <!-- Título de la lista -->
+      <div class="flex items-center justify-between py-2 px-4">
+        <div class="text-xl font-semibold">LISTADO DE PREMIOS</div>
+        <p-iconfield>
+          <p-inputicon styleClass="pi pi-search" />
+          <input
+            type="text"
+            pInputText
+            placeholder="Buscar premio"
+            [(ngModel)]="term"
+          />
+        </p-iconfield>
       </div>
-      <div class="overflow-y-scroll max-h-[calc(100vh-180px)]">
-        <p-dataview [value]="filteredPrizes()" emptyMessage="Sin resultados">
-          <ng-template #list let-items>
-            <div class="grid grid-cols-12 grid-nogutter">
-              @for (item of items; track $index) {
-              <div
-                class="col-span-12"
-                [ngClass]="{ 'bg-blue-100': currentPrize()?.id === item.id }"
-              >
-                <div
-                  class="flex flex-col sm:flex-row sm:items-center p-2 gap-4"
-                  [ngClass]="{
-                    'border-t border-surface-700': $index !== 0
-                  }"
-                >
-                  <div class="md:w-32 relative flex justify-center">
-                    <img class="object-contain h-24" [src]="item.image" />
-                  </div>
-                  <div
-                    class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6"
-                  >
-                    <div
-                      class="flex flex-row md:flex-col justify-between items-start gap-2"
-                    >
-                      <div>
-                        <span class="font-bold text-lg">
-                          {{ item.number }} - {{ item.name }}
-                        </span>
-                        <div class="text-sm font-medium">
-                          {{ item.description }}
-                        </div>
-                      </div>
-                    </div>
-                    <div class="flex flex-col md:items-end gap-8">
-                      @if(item.participant){
-                      <p-tag severity="success" value="Sorteado" />
-                      } @else {
-                      <p-tag severity="warn" value="Pendiente" />
-                      }
-                      <div class="flex flex-row-reverse md:flex-row">
-                        <p-button
-                          icon="pi pi-arrow-right"
-                          [outlined]="true"
-                          (onClick)="onSelectPrize(item)"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              }
-            </div>
-          </ng-template>
-        </p-dataview>
+
+      <!-- Contenedor Scrollable -->
+      <div class="overflow-y-auto" style="max-height: calc(100vh - 140px)">
+        <prizes-list-select
+          [datasource]="filteredPrizes()"
+          [(selectedItem)]="currentPrize"
+        />
       </div>
     </div>
+
+    <!-- Columna de Sorteo -->
     <div class="w-2/3 border-2 border-slate-400 m-4 p-4 rounded-xl">
       @if(currentPrize()){
       <raffle
         [prize]="currentPrize()!"
         (prizeChange)="setWinnerPrize($event)"
       />
+      } @else {
+      <div class="flex h-full items-center justify-center text-xl">
+        Seleccione un premio para iniciar
+      </div>
       }
     </div>
   </div>

@@ -26,7 +26,7 @@ import { Prize } from '../../../domain';
     CommonModule,
   ],
   template: `
-    @if (isLoading()) {
+    @if (!isLoading() && datasource().length===0) {
     <read-excel (onLoad)="onExcelLoad($event)" />
     } @else {
     <div class="card sm:px-8">
@@ -92,7 +92,6 @@ export class PrizesComponent implements OnInit {
     this.participantService.getPrizes().subscribe((data) => {
       this.datasource.set(data);
       this.isLoading.set(false);
-      console.log(data);
     });
   }
 

@@ -53,6 +53,11 @@ import { CommonModule } from '@angular/common';
           </td>
         </tr>
       </ng-template>
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="6">Sin resultados</td>
+        </tr>
+      </ng-template>
     </p-table>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -71,5 +76,7 @@ export class WinnersComponent implements OnInit {
     });
   }
 
-  export() {}
+  export() {
+    this.participantService.generatePdf(this.datasource());
+  }
 }

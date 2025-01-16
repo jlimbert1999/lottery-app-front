@@ -27,7 +27,7 @@ import { Participant } from '../../../domain';
         [multiple]="false"
         [customUpload]="true"
         (uploadHandler)="onUpload($event)"
-        accept=".xlsx,.odt"
+        accept=".xlsx,.odt,.ods"
         maxFileSize="5000000"
         mode="advanced"
       >

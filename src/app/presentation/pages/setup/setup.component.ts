@@ -11,7 +11,7 @@ import { DataViewModule } from 'primeng/dataview';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 
-import { RaffleComponent } from '../../components';
+import { PrizesListSelectComponent, RaffleComponent } from '../../components';
 import { ParticipantService } from '../../services/participant.service';
 import { Prize } from '../../../domain';
 import { IconFieldModule } from 'primeng/iconfield';
@@ -32,9 +32,9 @@ import { FormsModule } from '@angular/forms';
     InputIconModule,
     FloatLabelModule,
     InputTextModule,
+    PrizesListSelectComponent,
   ],
   templateUrl: './setup.component.html',
-  styleUrl: './setup.component.css',
   changeDetection: ChangeDetectionStrategy.Default,
 })
 export class SetupComponent implements OnInit {
@@ -49,7 +49,7 @@ export class SetupComponent implements OnInit {
   message = computed(() => {
     const drawn = this.prizes().filter(({ participant }) => participant).length;
     if (drawn === 0) {
-      return `${this.prizes().length} PRESMISO DISPONILBES`;
+      return `${this.prizes().length} PREMIOS DISPONILBES`;
     }
     return `${drawn} Sorteados / ${this.prizes().length - drawn} Disponibles`;
   });

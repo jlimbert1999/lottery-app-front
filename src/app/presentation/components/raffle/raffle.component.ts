@@ -3,10 +3,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  effect,
   inject,
   model,
   OnInit,
   signal,
+  untracked,
 } from '@angular/core';
 import {
   debounce,
@@ -26,37 +28,34 @@ import { Prize } from '../../../domain';
   selector: 'raffle',
   imports: [CommonModule, ButtonModule, ProgressBarModule],
   template: `
-    <div class="flex flex-col items-center gap-y-2 h-full w-full">
-      <div class="flex flex-col h-1/6 w-full">
-        <!-- <div
+    <div class="flex flex-col gap-y-6 items-center">
+      <div class="h-1/6 w-full">
+        <div
           class="text-center animate__animated animate__pulse animate__infinite"
         >
-          <img
+          <!-- <img
             src="images/institution.jpeg"
             class="mx-auto w-48"
             alt="Institution image"
-          />
+          /> -->
           <div
-            class="mt-8 text-sm font-bold md:text-sm lg:text-sm xl:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500"
+            class="font-bold text-5xl text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500"
           >
             GRAN SORTEO
           </div>
           <div
-            class="mt-4 text-balance text-md font-semibold tracking-tight text-gray-900 sm:text-3xl"
+            class="mt-2 text-balance text-md font-semibold tracking-tight text-gray-900 sm:text-3xl"
           >
             “AL BUEN CONTRIBUYENTE” SACABA
           </div>
-        </div> -->
+        </div>
       </div>
 
       <div
-        class="flex border border-slate-400 rounded-lg w-10/12 gap-x-6 h-2/6"
+        class="flex space-x-6 border border-slate-400 rounded-lg w-10/12 h-2/6"
       >
-        <img
-          [src]="prize().image"
-          class="object-fill max-h-full w-96 rounded-xl"
-        />
-        <div class="flex-1">
+        <img [src]="prize().image" class="object-fill h-48 w-96 rounded-lg" />
+        <div class="flex-1 py-2">
           <h6 class="mb-6 block font-semibold text-red-500 text-2xl">
             PREMIO NUMERO {{ prize().number }}
           </h6>
@@ -68,43 +67,28 @@ import { Prize } from '../../../domain';
           </p>
         </div>
       </div>
-      <div
-        class="h-4/6 flex flex-col items-center justify-center gap-y-4 w-full"
-      >
+
+      <div class="h-3/6 w-full mt-6 text-center">
         @if(prize().participant){
-        <div class="text-center animate__animated animate__fadeInDown">
-          <div class="text-2xl font-semibold animate__animated  ">GANADOR</div>
-          <div class="text-6xl">{{ prize().participant?.codeType }}</div>
+        <div class="animate__animated animate__fadeInDown">
+          <div class="text-center space-y-4">
+            <div class="text-2xl font-semibold animate__animated">GANADOR</div>
+            <div class="text-6xl">{{ prize().participant?.codeType }}</div>
+          </div>
+          <div
+            class="text-8xl font-semibold border-2 px-6 py-2 rounded-xl border-slate-400 w-full text-center text-sky-600"
+          >
+            {{ prize().participant?.code }}
+          </div>
         </div>
-        }
+        } @else {
         <div
           class="text-8xl font-semibold border-2 px-6 py-2 rounded-xl border-slate-400 w-full text-center"
         >
           {{ displayedNumber() }}
         </div>
-
-        @if(prize().participant){
-        <!-- <div class="flex items-center w-full px-4">
-          <span class="h-px flex-1 bg-black"></span>
-          <span class="shrink-0 px-6 text-xl font-bold sm:text-4xl">
-            GANADOR
-          </span>
-          <span class="h-px flex-1 bg-black"></span>
-        </div>
-
-        <div
-          class="text-balance text-xl font-semibold text-gray-500 sm:text-6xl"
-        >
-          {{ prize()?.participant?.codeType }}
-        </div>
-
-        <div class="text-6xl border-4 rounded-full px-8 py-3 border-gray-600">
-          <span>
-            {{ prize()?.participant?.code }}
-          </span>
-        </div> -->
-        } @else { @if(isSearching()){
-        <div class="card w-full ">
+        @if(isSearching()){
+        <div class="card w-full py-4">
           <p-progressbar mode="indeterminate" [style]="{ height: '12px' }" />
         </div>
         }
@@ -113,6 +97,7 @@ import { Prize } from '../../../domain';
           [disabled]="isSearching() || !prize()"
           (onClick)="startRaffle()"
           size="large"
+          styleClass="mt-4"
         />
         }
       </div>
@@ -128,8 +113,17 @@ export class RaffleComponent implements OnInit {
   private spinSubscription?: Subscription;
 
   prize = model.required<Prize>();
-  displayedNumber = signal<string>('00000000');
+  displayedNumber = signal<string>('------');
   isSearching = signal(false);
+
+  constructor() {
+    effect(() => {
+      const winnerCode = this.prize().participant?.code ?? '0000000';
+      untracked(() => {
+        this.displayedNumber.set(winnerCode);
+      });
+    });
+  }
 
   ngOnInit(): void {
     this.startSubject
