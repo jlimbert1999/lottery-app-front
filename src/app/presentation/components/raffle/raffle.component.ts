@@ -87,19 +87,26 @@ import { Prize } from '../../../domain';
         >
           {{ displayedNumber() }}
         </div>
-        @if(isSearching()){
+        @if(isRunning()){
         <div class="card w-full py-4">
           <p-progressbar mode="indeterminate" [style]="{ height: '12px' }" />
         </div>
-        }
+        <p-button
+          label="DETENER"
+          (onClick)="stopRaffle()"
+          size="large"
+          severity="danger"
+          styleClass="mt-4"
+        />
+        } @else {
         <p-button
           label="INICIAR"
-          [disabled]="isSearching() || !prize()"
+          [disabled]="!prize()"
           (onClick)="startRaffle()"
           size="large"
           styleClass="mt-4"
         />
-        }
+        } }
       </div>
     </div>
   `,
@@ -107,14 +114,13 @@ import { Prize } from '../../../domain';
 })
 export class RaffleComponent implements OnInit {
   private destroyRef = inject(DestroyRef);
-  private startSubject = new Subject<void>();
   private participantService = inject(ParticipantService);
 
   private spinSubscription?: Subscription;
 
   prize = model.required<Prize>();
   displayedNumber = signal<string>('------');
-  isSearching = signal(false);
+  isRunning = signal(false);
 
   constructor() {
     effect(() => {
@@ -125,49 +131,52 @@ export class RaffleComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    this.startSubject
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        debounce(() => timer(this._getRandomDelay())),
-        switchMap(() => this.participantService.getWinner(this.prize().id))
-      )
-      .subscribe({
-        next: (prize) => {
-          this.stopRaffle();
-          this.prize.set(prize);
-        },
-        error: () => {
-          this.stopRaffle();
-        },
+  ngOnInit(): void {}
+
+  startRaffle(): void {
+    if (this.isRunning()) return;
+    this.isRunning.set(true);
+    this.spinSubscription = interval(100)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.displayedNumber.set(this._getRandomNumber());
       });
   }
 
-  startRaffle(): void {
-    if (this.isSearching()) return;
-    this.isSearching.set(true);
-    this.displayedNumber.set('00000000');
-    this.spinSubscription = interval(100).subscribe(() => {
-      this.displayedNumber.set(this._getRandomNumber());
-    });
-    this.startSubject.next();
-  }
-
   stopRaffle() {
-    this.spinSubscription?.unsubscribe();
-    this.isSearching.set(false);
+    if (!this.isRunning()) return;
+    this.participantService.getWinner(this.prize().id).subscribe({
+      next: (prize) => {
+        this.prize.set(prize);
+        this.isRunning.set(false);
+        this.spinSubscription?.unsubscribe();
+      },
+      error: () => {
+        this.isRunning.set(false);
+        this.spinSubscription?.unsubscribe();
+      },
+    });
   }
 
   private _getRandomNumber(): string {
-    const length = Math.floor(Math.random() * 8) + 5; // Números de 1 a 5 dígitos
-    let number = '';
-    for (let i = 0; i < length; i++) {
-      number += Math.floor(Math.random() * 10).toString();
-    }
-    return number;
-  }
+    const lettersAndSymbols = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numbers = '0123456789';
+    const length = Math.floor(Math.random() * 8) + 5; // Longitud entre 5 y 12 caracteres
+    let result = '';
 
-  private _getRandomDelay() {
-    return (Math.floor(Math.random() * (6 - 3 + 1)) + 3) * 1000;
+    for (let i = 0; i < length; i++) {
+      if (i % 2 === 0) {
+        // Alterna entre números y caracteres
+        const randomIndex = Math.floor(Math.random() * numbers.length);
+        result += numbers[randomIndex];
+      } else {
+        const randomIndex = Math.floor(
+          Math.random() * lettersAndSymbols.length
+        );
+        result += lettersAndSymbols[randomIndex];
+      }
+    }
+
+    return result;
   }
 }

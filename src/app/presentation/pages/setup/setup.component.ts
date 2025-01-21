@@ -49,9 +49,11 @@ export class SetupComponent implements OnInit {
   message = computed(() => {
     const drawn = this.prizes().filter(({ participant }) => participant).length;
     if (drawn === 0) {
-      return `${this.prizes().length} PREMIOS DISPONILBES`;
+      return `${this.prizes().length} PREMIOS DISPONIBLES`;
     }
-    return `${drawn} Sorteados / ${this.prizes().length - drawn} Disponibles`;
+    return `${drawn === 1 ? 'Sorteado' : 'Sorteados'}  / ${
+      this.prizes().length - drawn
+    } Disponibles`;
   });
 
   ngOnInit(): void {
