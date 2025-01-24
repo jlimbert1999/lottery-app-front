@@ -73,9 +73,13 @@ export class ParticipantService {
   }
 
   getAppDetails() {
-    return this.http.get<{ totalParticipants: number; totalPrizes: number }>(
-      `${this.url}/details`
-    );
+    return this.http.get<{
+      totalParticipants: number;
+      totalPrizes: number;
+      totalInmueble: number;
+      totalVehiculo: number;
+      totalLicencia: number;
+    }>(`${this.url}/details`);
   }
 
   generatePdf(prizes: Prize[]) {

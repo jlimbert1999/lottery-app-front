@@ -58,8 +58,32 @@ import { RouterModule } from '@angular/router';
       </div>
       <div class="mt-20">
         <dl
-          class="grid grid-cols-1 gap-x-12 gap-y-16 text-center lg:grid-cols-2"
+          class="grid grid-cols-1 gap-x-12 gap-y-16 text-center lg:grid-cols-5"
         >
+          <div class="mx-auto flex max-w-xs flex-col gap-y-4">
+            <dt class="text-base/7 text-gray-600">Vehiculos</dt>
+            <dd
+              class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"
+            >
+              {{ appDetails().totalVehiculo }}
+            </dd>
+          </div>
+          <div class="mx-auto flex max-w-xs flex-col gap-y-4">
+            <dt class="text-base/7 text-gray-600">Actividades economicas</dt>
+            <dd
+              class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"
+            >
+              {{ appDetails().totalLicencia }}
+            </dd>
+          </div>
+          <div class="mx-auto flex max-w-xs flex-col gap-y-4">
+            <dt class="text-base/7 text-gray-600">Bienes Inmuebles</dt>
+            <dd
+              class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"
+            >
+              {{ appDetails().totalInmueble }}
+            </dd>
+          </div>
           <div class="mx-auto flex max-w-xs flex-col gap-y-4">
             <dt class="text-base/7 text-gray-600">Participantes registrados</dt>
             <dd
@@ -68,6 +92,7 @@ import { RouterModule } from '@angular/router';
               {{ appDetails().totalParticipants }}
             </dd>
           </div>
+
           <div class="mx-auto flex max-w-xs flex-col gap-y-4">
             <dt class="text-base/7 text-gray-600">Premios habilitados</dt>
             <dd
@@ -91,6 +116,12 @@ import { RouterModule } from '@angular/router';
 export class LandingComponent {
   private participantService = inject(ParticipantService);
   appDetails = toSignal(this.participantService.getAppDetails(), {
-    initialValue: { totalParticipants: 0, totalPrizes: 0 },
+    initialValue: {
+      totalParticipants: 0,
+      totalPrizes: 0,
+      totalLicencia: 0,
+      totalInmueble: 0,
+      totalVehiculo: 0,
+    },
   });
 }

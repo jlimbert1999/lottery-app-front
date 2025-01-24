@@ -51,7 +51,7 @@ export class SetupComponent implements OnInit {
     if (drawn === 0) {
       return `${this.prizes().length} PREMIOS DISPONIBLES`;
     }
-    return `${drawn === 1 ? 'Sorteado' : 'Sorteados'}  / ${
+    return `${drawn === 1 ? '1 Sorteado' : `${drawn} Sorteados`}  / ${
       this.prizes().length - drawn
     } Disponibles`;
   });
