@@ -51,6 +51,9 @@ export class SetupComponent implements OnInit {
     if (drawn === 0) {
       return `${this.prizes().length} PREMIOS DISPONIBLES`;
     }
+    if (drawn === this.prizes().length) {
+      return 'SORTEO COMPLETADO';
+    }
     return `${drawn === 1 ? '1 Sorteado' : `${drawn} Sorteados`}  / ${
       this.prizes().length - drawn
     } Disponibles`;
@@ -76,6 +79,11 @@ export class SetupComponent implements OnInit {
     this.participantService.getPrizes().subscribe((resp) => {
       this.prizes.set(resp);
     });
+  }
+
+  async print() {
+    const winners = this.prizes().filter((el) => el.participant);
+    await this.participantService.generatePdf(winners);
   }
 
   private _filterPrizes(): Prize[] {

@@ -10,15 +10,8 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import {
-  debounce,
-  interval,
-  Subject,
-  Subscription,
-  switchMap,
-  timer,
-} from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { interval, Subscription } from 'rxjs';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ButtonModule } from 'primeng/button';
 
@@ -28,26 +21,23 @@ import { Prize } from '../../../domain';
   selector: 'raffle',
   imports: [CommonModule, ButtonModule, ProgressBarModule],
   template: `
-    <div class="flex flex-col gap-y-6 items-center">
+    <div class="flex flex-col gap-y-6 items-center h-full">
       <div class="h-1/6 w-full">
-        <div
-          class="text-center animate__animated animate__pulse animate__infinite"
-        >
-          <!-- <img
-            src="images/institution.jpeg"
-            class="mx-auto w-48"
-            alt="Institution image"
-          /> -->
-          <div
-            class="font-bold text-5xl text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500"
-          >
-            GRAN SORTEO
+        <div class="flex justify-between">
+          <img src="images/institution.jpeg" class=" w-52" />
+          <div class="text-center">
+            <div
+              class="font-bold text-5xl text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500"
+            >
+              GRAN SORTEO
+            </div>
+            <div
+              class="mt-2 text-balance text-md font-semibold tracking-tight text-gray-900 sm:text-3xl"
+            >
+              “AL BUEN CONTRIBUYENTE” SACABA
+            </div>
           </div>
-          <div
-            class="mt-2 text-balance text-md font-semibold tracking-tight text-gray-900 sm:text-3xl"
-          >
-            “AL BUEN CONTRIBUYENTE” SACABA
-          </div>
+          <img src="images/slogan.png" class=" w-48" />
         </div>
       </div>
 
@@ -72,7 +62,7 @@ import { Prize } from '../../../domain';
         @if(prize().participant){
         <div class="animate__animated animate__fadeInDown">
           <div class="text-center space-y-4">
-            <div class="text-2xl font-semibold animate__animated">GANADOR</div>
+            <div class="text-3xl font-semibold animate__animated">GANADOR</div>
             <div class="text-6xl">{{ prize().participant?.codeType }}</div>
           </div>
           <div

@@ -76,7 +76,7 @@ export class WinnersComponent implements OnInit {
     });
   }
 
-  export() {
-    this.participantService.generatePdf(this.datasource());
+  async export() {
+    await this.participantService.generatePdf(this.datasource());
   }
 }

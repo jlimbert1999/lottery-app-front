@@ -10,14 +10,17 @@ export const routes: Routes = [
   {
     path: '',
     component: LandingComponent,
+    title: 'Presentancion',
   },
   {
     path: 'main',
     component: SetupComponent,
+    title: 'Inicio - Sorteo',
   },
   {
     path: 'home',
     component: HomeComponent,
+    title: 'Menu',
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'participants' },
       { path: 'participants', component: ParticipantsComponent },

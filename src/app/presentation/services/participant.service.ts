@@ -16,6 +16,7 @@ import {
 } from '../../infrastructure';
 import { Prize } from '../../domain';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
+import { convertImageABase64 } from '../../../helpers';
 
 type participantResponse = participantEntity[] | participantIndividual[];
 interface paginationParams {
@@ -82,39 +83,56 @@ export class ParticipantService {
     }>(`${this.url}/details`);
   }
 
-  generatePdf(prizes: Prize[]) {
+  async generatePdf(prizes: Prize[]) {
+    const leftImage = await convertImageABase64('images/institution.jpeg');
+    const rightImage = await convertImageABase64('images/slogan.png');
+    prizes = prizes.sort((a, b) => a.number - b.number);
     const docDefinition: TDocumentDefinitions = {
       pageOrientation: 'landscape',
+      pageMargins: [40, 90, 40, 40],
+      header: {
+        margin: [20, 20, 20, 20],
+        columns: [
+          {
+            image: leftImage,
+            width: 130,
+            alignment: 'left',
+          },
+          [
+            {
+              text: 'LISTADO DE PARTICIPANTES GANADORES',
+              alignment: 'center',
+              style: 'header',
+            },
+            {
+              text: '“SORTEO AL BUEN CONTRIBUYENTE” SACABA',
+              alignment: 'center',
+              style: 'subheader',
+            },
+          ],
+          {
+            image: rightImage,
+            width: 130,
+            alignment: 'right',
+          },
+        ],
+      },
       content: [
-        {
-          text: 'LISTADO DE PARTICIPANTES GANADORES',
-          alignment: 'center',
-          style: 'header',
-        },
-        {
-          text: '“AL BUEN CONTRIBUYENTE” SACABA',
-          alignment: 'center',
-          style: 'subheader',
-        },
         {
           fontSize: 9,
           table: {
             headerRows: 1,
-            widths: [25, '*', '*', '*', '*', 100],
+            widths: [25, '*', '*',  "*"],
             body: [
               [
                 { text: 'Nro', style: 'tableHeader' },
-                { text: 'Nombre', style: 'tableHeader' },
-                { text: 'Contribuyente', style: 'tableHeader' },
-                { text: 'CI / NIT', style: 'tableHeader' },
+                { text: 'Premio', style: 'tableHeader' },
                 { text: 'Documento', style: 'tableHeader' },
                 { text: 'Numero', style: 'tableHeader' },
               ],
               ...prizes.map((el) => [
                 el.number,
                 el.name,
-                el.participant!.fullname,
-                el.participant!.documentNumber,
                 el.participant!.codeType,
                 el.participant!.code,
               ]),
