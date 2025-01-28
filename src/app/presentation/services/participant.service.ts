@@ -105,7 +105,7 @@ export class ParticipantService {
               style: 'header',
             },
             {
-              text: '“SORTEO AL BUEN CONTRIBUYENTE” SACABA',
+              text: 'GRAN SORTEO AL "BUEN CONTRIBUYENTE 2da. VERSION” SACABA - 2025',
               alignment: 'center',
               style: 'subheader',
             },
@@ -122,12 +122,12 @@ export class ParticipantService {
           fontSize: 9,
           table: {
             headerRows: 1,
-            widths: [25, '*', '*',  "*"],
+            widths: [25, '*', '*', '*'],
             body: [
               [
-                { text: 'Nro', style: 'tableHeader' },
+                { text: 'Nro.', style: 'tableHeader' },
                 { text: 'Premio', style: 'tableHeader' },
-                { text: 'Documento', style: 'tableHeader' },
+                { text: 'Rubro', style: 'tableHeader' },
                 { text: 'Numero', style: 'tableHeader' },
               ],
               ...prizes.map((el) => [

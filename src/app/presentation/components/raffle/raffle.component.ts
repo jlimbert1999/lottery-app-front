@@ -32,9 +32,9 @@ import { Prize } from '../../../domain';
               GRAN SORTEO
             </div>
             <div
-              class="mt-2 text-balance text-md font-semibold tracking-tight text-gray-900 sm:text-3xl"
+              class="mt-2 text-balance text-md font-semibold tracking-tight text-gray-900 sm:text-2xl"
             >
-              “AL BUEN CONTRIBUYENTE” SACABA
+              AL “BUEN CONTRIBUYENTE 2da. VERSION” SACABA - 2025
             </div>
           </div>
           <img src="images/slogan.png" class=" w-48" />
@@ -93,6 +93,7 @@ import { Prize } from '../../../domain';
           label="INICIAR"
           [disabled]="!prize()"
           (onClick)="startRaffle()"
+          [rounded]="true"
           size="large"
           styleClass="mt-4"
         />
@@ -126,7 +127,7 @@ export class RaffleComponent implements OnInit {
   startRaffle(): void {
     if (this.isRunning()) return;
     this.isRunning.set(true);
-    this.spinSubscription = interval(100)
+    this.spinSubscription = interval(90)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.displayedNumber.set(this._getRandomNumber());

@@ -13,16 +13,29 @@ import {
 } from 'primeng/fileupload';
 import { ButtonModule } from 'primeng/button';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { read, utils } from 'xlsx';
 import { ParticipantService } from '../../services/participant.service';
 import { Participant } from '../../../domain';
-
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+import { Toast } from 'primeng/toast';
 @Component({
   selector: 'app-participants',
-  imports: [TableModule, FileUploadModule, ButtonModule, PaginatorModule],
+  imports: [
+    TableModule,
+    FileUploadModule,
+    ButtonModule,
+    PaginatorModule,
+    ProgressSpinnerModule,
+    ToastModule,
+    Toast,
+  ],
   template: `
+    <p-toast />
     @if (!isLoading() && datasize()===0) {
-    <div class="card flex gap-2 justify-center">
+
+    <div class="card flex flex-col gap-2 justify-center items-center">
       <p-fileupload
         [multiple]="false"
         [customUpload]="true"
@@ -35,8 +48,12 @@ import { Participant } from '../../../domain';
           <div>Seleccione un archivo para cargar los datos</div>
         </ng-template>
       </p-fileupload>
-    </div>
 
+      @if(isUplodingData()){
+
+      <p-progress-spinner ariaLabel="loading" />
+      }
+    </div>
     } @else {
     <div class="card">
       <p-table [value]="datasource()" [tableStyle]="{ 'min-width': '50rem' }">
@@ -75,6 +92,7 @@ import { Participant } from '../../../domain';
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // providers: [MessageService],
 })
 export class ParticipantsComponent {
   private participantService = inject(ParticipantService);
@@ -84,6 +102,9 @@ export class ParticipantsComponent {
   index = signal(0);
   offset = computed(() => this.limit() * this.index());
   isLoading = signal(true);
+  private messageService = inject(MessageService);
+
+  isUplodingData = signal(false);
 
   ngOnInit() {
     this.getData();
@@ -109,6 +130,7 @@ export class ParticipantsComponent {
     const file = event.files[0];
     const reader = new FileReader();
     const data: { type: string; participants: Object[] }[] = [];
+    this.isUplodingData.set(true);
     reader.onload = (e) => {
       const arrayBuffer = e.target?.result as ArrayBuffer;
       const wb = read(arrayBuffer, { type: 'array' });
@@ -119,7 +141,25 @@ export class ParticipantsComponent {
           participants: utils.sheet_to_json(wb.Sheets[name]),
         });
       }
-      this.participantService.uploadParticipants(data).subscribe();
+      this.participantService.uploadParticipants(data).subscribe({
+        next: () => {
+          this.isUplodingData.set(false);
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Datos cargados correctamente',
+            detail: `Se completdo la subida del archivo`,
+          });
+          this.getData()
+        },
+        error: () => {
+          this.isUplodingData.set(false);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error al cargar los datos',
+            detail: 'Revise el formato adjuntado',
+          });
+        },
+      });
     };
     reader.readAsArrayBuffer(file);
   }

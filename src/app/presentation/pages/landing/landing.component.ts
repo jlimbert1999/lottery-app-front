@@ -4,12 +4,15 @@ import { ButtonModule } from 'primeng/button';
 
 import { ParticipantService } from '../../services/participant.service';
 import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-landing',
-  imports: [ButtonModule, RouterModule],
+  imports: [ButtonModule, RouterModule, CommonModule],
   template: `
-    <div class="h-screen flex flex-col animate__animated animate__fadeIn animate__slow">
+    <div
+      class="h-screen flex flex-col animate__animated animate__fadeIn animate__slow"
+    >
       <div class="flex justify-between p-6 h-[140px]">
         <img
           src="images/institution.jpeg"
@@ -40,14 +43,14 @@ import { RouterModule } from '@angular/router';
             >
               <span class="sm:text-7xl">GRAN SORTEO</span>
               <span class="block text-4xl">
-                “AL BUEN CONTRIBUYENTE” SACABA
+                AL "BUEN CONTRIBUYENTE 2da. VERSION" SACABA - 2025
               </span>
             </div>
 
             <p
               class="mt-8 text-pretty text-md font-medium text-gray-500 sm:text-xl"
             >
-              Participan todas las personas que hayan pagado sus impuestos y no
+              Participan todos los contribuyentes naturales y juridicos que no
               tengan deudas pendientes con el municipio
             </p>
 
@@ -58,52 +61,53 @@ import { RouterModule } from '@angular/router';
                 severity="info"
                 size="large"
                 [raised]="true"
+                [rounded]="true"
                 [routerLink]="['/main']"
               />
             </div>
           </div>
         </div>
-        <div class="mt-20">
-          <dl
-            class="grid grid-cols-1 gap-x-12 gap-y-16 text-center lg:grid-cols-5"
-          >
+        <div class="mt-16 space-y-8">
+          <dl class="grid grid-cols-1 gap-x-12 text-center lg:grid-cols-3">
             <div class="mx-auto flex max-w-xs flex-col gap-y-4">
-              <dt class="text-base/7 text-gray-600">Vehiculos</dt>
+              <dt class="text-xl text-gray-600">Actividades economicas</dt>
               <dd
                 class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"
               >
-                {{ appDetails().totalVehiculo }}
+                {{ appDetails().totalLicencia | number }}
               </dd>
             </div>
             <div class="mx-auto flex max-w-xs flex-col gap-y-4">
-              <dt class="text-base/7 text-gray-600">Actividades economicas</dt>
+              <dt class="text-xl text-gray-600">Vehiculos</dt>
               <dd
                 class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"
               >
-                {{ appDetails().totalLicencia }}
+                {{ appDetails().totalVehiculo | number }}
               </dd>
             </div>
             <div class="mx-auto flex max-w-xs flex-col gap-y-4">
-              <dt class="text-base/7 text-gray-600">Bienes Inmuebles</dt>
+              <dt class="text-xl text-gray-600">Bienes Inmuebles</dt>
               <dd
                 class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"
               >
-                {{ appDetails().totalInmueble }}
+                {{ appDetails().totalInmueble | number }}
               </dd>
             </div>
+          </dl>
+          <dl class="grid grid-cols-2 gap-x-12 text-center">
             <div class="mx-auto flex max-w-xs flex-col gap-y-4">
-              <dt class="text-base/7 text-gray-600">
-                Participantes registrados
+              <dt class="text-2xl text-gray-600">
+                Total de participantes registrados
               </dt>
               <dd
-                class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"
+                class="order-first text-xl font-semibold tracking-tight text-gray-900 sm:text-5xl"
               >
-                {{ appDetails().totalParticipants }}
+                {{ appDetails().totalParticipants | number }}
               </dd>
             </div>
 
             <div class="mx-auto flex max-w-xs flex-col gap-y-4">
-              <dt class="text-base/7 text-gray-600">Premios habilitados</dt>
+              <dt class="text-2xl text-gray-600">Premios habilitados</dt>
               <dd
                 class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"
               >
