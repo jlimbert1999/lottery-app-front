@@ -105,7 +105,7 @@ export class ParticipantService {
               style: 'header',
             },
             {
-              text: 'GRAN SORTEO AL "BUEN CONTRIBUYENTE 2da. VERSION” SACABA - 2025',
+              text: 'GRAN SORTEO AL "BUEN CONTRIBUYENTE 3ra. VERSION” SACABA - 2026',
               alignment: 'center',
               style: 'subheader',
             },

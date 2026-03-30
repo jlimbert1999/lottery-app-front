@@ -34,7 +34,7 @@ import { Prize } from '../../../domain';
             <div
               class="mt-2 text-balance text-md font-semibold tracking-tight text-gray-900 sm:text-2xl"
             >
-              AL “BUEN CONTRIBUYENTE 2da. VERSION” SACABA - 2025
+              AL “BUEN CONTRIBUYENTE 3ra. VERSION” SACABA - 2026
             </div>
           </div>
           <img src="images/slogan.png" class=" w-48" />

@@ -43,7 +43,7 @@ import { CommonModule } from '@angular/common';
             >
               <span class="sm:text-7xl">GRAN SORTEO</span>
               <span class="block text-4xl">
-                AL "BUEN CONTRIBUYENTE 2da. VERSION" SACABA - 2025
+                AL "BUEN CONTRIBUYENTE 3ra. VERSION" SACABA - 2026
               </span>
             </div>
 
